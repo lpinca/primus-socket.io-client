@@ -1,12 +1,6 @@
+'use strict';
 
-/*!
- * socket.io-node
- * Copyright(c) 2011 LearnBoost <dev@learnboost.com>
- * MIT Licensed
- */
-
-var vm = require('vm')
-  , should = require('should');
+var vm = require('vm');
 
 /**
  * Generates evn variables for the vm so we can `emulate` a browser.
@@ -64,13 +58,13 @@ exports.env = function env () {
   details.window = details.self = details.contentWindow = details;
 
   // callable methods
-  details.Image = details.scrollTo = details.scrollBy = details.scroll = 
-  details.resizeTo = details.resizeBy = details.prompt = details.print = 
-  details.open = details.moveTo = details.moveBy = details.focus = 
-  details.createPopup = details.confirm = details.close = details.blur = 
-  details.alert = details.clearTimeout = details.clearInterval = 
-  details.setInterval = details.setTimeout = details.XMLHttpRequest = 
-  details.getComputedStyle = details.trigger = details.dispatchEvent = 
+  details.Image = details.scrollTo = details.scrollBy = details.scroll =
+  details.resizeTo = details.resizeBy = details.prompt = details.print =
+  details.open = details.moveTo = details.moveBy = details.focus =
+  details.createPopup = details.confirm = details.close = details.blur =
+  details.alert = details.clearTimeout = details.clearInterval =
+  details.setInterval = details.setTimeout = details.XMLHttpRequest =
+  details.getComputedStyle = details.trigger = details.dispatchEvent =
   details.removeEventListener = details.addEventListener = function(){};
 
   // frames
@@ -92,7 +86,7 @@ exports.env = function env () {
  */
 
 exports.execute = function execute (contents) {
-  var env = exports.env() 
+  var env = exports.env()
     , script = vm.createScript(contents);
 
   // run the script with `browser like` globals

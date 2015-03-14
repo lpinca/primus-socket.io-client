@@ -1,360 +1,347 @@
+describe('parser', function () {
+  'use strict';
 
-/*!
- * socket.io-node
- * Copyright(c) 2011 LearnBoost <dev@learnboost.com>
- * MIT Licensed
- */
+  var assume = require('assume')
+    , io = require('..')
+    , parser = io.parser;
 
-(function (module, io, should) {
+  it('decoding error packet', function () {
+    assume(parser.decodePacket('7:::')).eql({
+        type: 'error'
+      , reason: ''
+      , advice: ''
+      , endpoint: ''
+    });
+  });
 
-  var parser = io.parser;
+  it('decoding error packet with reason', function () {
+    assume(parser.decodePacket('7:::0')).eql({
+        type: 'error'
+      , reason: 'transport not supported'
+      , advice: ''
+      , endpoint: ''
+    });
+  });
 
-  module.exports = {
+  it('decoding error packet with reason and advice', function () {
+    assume(parser.decodePacket('7:::2+0')).eql({
+        type: 'error'
+      , reason: 'unauthorized'
+      , advice: 'reconnect'
+      , endpoint: ''
+    });
+  });
 
-    'decoding error packet': function () {
-      parser.decodePacket('7:::').should().eql({
-          type: 'error'
-        , reason: ''
-        , advice: ''
-        , endpoint: ''
-      });
-    },
+  it('decoding error packet with endpoint', function () {
+    assume(parser.decodePacket('7::/woot')).eql({
+        type: 'error'
+      , reason: ''
+      , advice: ''
+      , endpoint: '/woot'
+    });
+  });
 
-    'decoding error packet with reason': function () {
-      parser.decodePacket('7:::0').should().eql({
-          type: 'error'
-        , reason: 'transport not supported'
-        , advice: ''
-        , endpoint: ''
-      });
-    },
+  it('decoding ack packet', function () {
+    assume(parser.decodePacket('6:::140')).eql({
+        type: 'ack'
+      , ackId: '140'
+      , endpoint: ''
+      , args: []
+    });
+  });
 
-    'decoding error packet with reason and advice': function () {
-      parser.decodePacket('7:::2+0').should().eql({
-          type: 'error'
-        , reason: 'unauthorized'
-        , advice: 'reconnect'
-        , endpoint: ''
-      });
-    },
+  it('decoding ack packet with args', function () {
+    assume(parser.decodePacket('6:::12+["woot","wa"]')).eql({
+        type: 'ack'
+      , ackId: '12'
+      , endpoint: ''
+      , args: ['woot', 'wa']
+    });
+  });
 
-    'decoding error packet with endpoint': function () {
-      parser.decodePacket('7::/woot').should().eql({
-          type: 'error'
-        , reason: ''
-        , advice: ''
-        , endpoint: '/woot'
-      });
-    },
+  it('decoding ack packet with bad json', function () {
+    var thrown = false;
 
-    'decoding ack packet': function () {
-      parser.decodePacket('6:::140').should().eql({
+    try {
+      assume(parser.decodePacket('6:::1+{"++]')).eql({
           type: 'ack'
-        , ackId: '140'
+        , ackId: '1'
         , endpoint: ''
         , args: []
       });
-    },
-
-    'decoding ack packet with args': function () {
-      parser.decodePacket('6:::12+["woot","wa"]').should().eql({
-          type: 'ack'
-        , ackId: '12'
-        , endpoint: ''
-        , args: ['woot', 'wa']
-      });
-    },
-
-    'decoding ack packet with bad json': function () {
-      var thrown = false;
-
-      try {
-        parser.decodePacket('6:::1+{"++]').should().eql({
-            type: 'ack'
-          , ackId: '1'
-          , endpoint: ''
-          , args: []
-        });
-      } catch (e) {
-        thrown = true;
-      }
-
-      thrown.should().be_false;
-    },
-
-    'decoding json packet': function () {
-      parser.decodePacket('4:::"2"').should().eql({
-          type: 'json'
-        , endpoint: ''
-        , data: '2'
-      });
-    },
-
-    'decoding json packet with message id and ack data': function () {
-      parser.decodePacket('4:1+::{"a":"b"}').should().eql({
-          type: 'json'
-        , id: 1
-        , ack: 'data'
-        , endpoint: ''
-        , data: { a: 'b' }
-      });
-    },
-
-    'decoding an event packet': function () {
-      parser.decodePacket('5:::{"name":"woot"}').should().eql({
-          type: 'event'
-        , name: 'woot'
-        , endpoint: ''
-        , args: []
-      });
-    },
-
-    'decoding an event packet with message id and ack': function () {
-      parser.decodePacket('5:1+::{"name":"tobi"}').should().eql({
-          type: 'event'
-        , id: 1
-        , ack: 'data'
-        , endpoint: ''
-        , name: 'tobi'
-        , args: []
-      });
-    },
-
-    'decoding an event packet with data': function () {
-      parser.decodePacket('5:::{"name":"edwald","args":[{"a": "b"},2,"3"]}')
-      .should().eql({
-          type: 'event'
-        , name: 'edwald'
-        , endpoint: ''
-        , args: [{a: 'b'}, 2, '3']
-      });
-    },
-
-    'decoding a message packet': function () {
-      parser.decodePacket('3:::woot').should().eql({
-          type: 'message'
-        , endpoint: ''
-        , data: 'woot'
-      });
-    },
-
-    'decoding a message packet with id and endpoint': function () {
-      parser.decodePacket('3:5:/tobi').should().eql({
-          type: 'message'
-        , id: 5
-        , ack: true
-        , endpoint: '/tobi'
-        , data: ''
-      });
-    },
-
-    'decoding a heartbeat packet': function () {
-      parser.decodePacket('2:::').should().eql({
-          type: 'heartbeat'
-        , endpoint: ''
-      });
-    },
-
-    'decoding a connection packet': function () {
-      parser.decodePacket('1::/tobi').should().eql({
-          type: 'connect'
-        , endpoint: '/tobi'
-        , qs: ''
-      });
-    },
-
-    'decoding a connection packet with query string': function () {
-      parser.decodePacket('1::/test:?test=1').should().eql({
-          type: 'connect'
-        , endpoint: '/test'
-        , qs: '?test=1'
-      });
-    },
-
-    'decoding a disconnection packet': function () {
-      parser.decodePacket('0::/woot').should().eql({
-          type: 'disconnect'
-        , endpoint: '/woot'
-      });
-    },
-
-    'encoding error packet': function () {
-      parser.encodePacket({
-          type: 'error'
-        , reason: ''
-        , advice: ''
-        , endpoint: ''
-      }).should().eql('7::');
-    },
-
-    'encoding error packet with reason': function () {
-      parser.encodePacket({
-          type: 'error'
-        , reason: 'transport not supported'
-        , advice: ''
-        , endpoint: ''
-      }).should().eql('7:::0');
-    },
-
-    'encoding error packet with reason and advice': function () {
-      parser.encodePacket({
-          type: 'error'
-        , reason: 'unauthorized'
-        , advice: 'reconnect'
-        , endpoint: ''
-      }).should().eql('7:::2+0');
-    },
-
-    'encoding error packet with endpoint': function () {
-      parser.encodePacket({
-          type: 'error'
-        , reason: ''
-        , advice: ''
-        , endpoint: '/woot'
-      }).should().eql('7::/woot');
-    },
-
-    'encoding ack packet': function () {
-      parser.encodePacket({
-          type: 'ack'
-        , ackId: '140'
-        , endpoint: ''
-        , args: []
-      }).should().eql('6:::140');
-    },
-
-    'encoding ack packet with args': function () {
-      parser.encodePacket({
-          type: 'ack'
-        , ackId: '12'
-        , endpoint: ''
-        , args: ['woot', 'wa']
-      }).should().eql('6:::12+["woot","wa"]');
-    },
-
-    'encoding json packet': function () {
-      parser.encodePacket({
-          type: 'json'
-        , endpoint: ''
-        , data: '2'
-      }).should().eql('4:::"2"');
-    },
-
-    'encoding json packet with message id and ack data': function () {
-      parser.encodePacket({
-          type: 'json'
-        , id: 1
-        , ack: 'data'
-        , endpoint: ''
-        , data: { a: 'b' }
-      }).should().eql('4:1+::{"a":"b"}');
-    },
-
-    'encoding an event packet': function () {
-      parser.encodePacket({
-          type: 'event'
-        , name: 'woot'
-        , endpoint: ''
-        , args: []
-      }).should().eql('5:::{"name":"woot"}');
-    },
-
-    'encoding an event packet with message id and ack': function () {
-      parser.encodePacket({
-          type: 'event'
-        , id: 1
-        , ack: 'data'
-        , endpoint: ''
-        , name: 'tobi'
-        , args: []
-      }).should().eql('5:1+::{"name":"tobi"}');
-    },
-
-    'encoding an event packet with data': function () {
-      parser.encodePacket({
-          type: 'event'
-        , name: 'edwald'
-        , endpoint: ''
-        , args: [{a: 'b'}, 2, '3']
-      }).should().eql('5:::{"name":"edwald","args":[{"a":"b"},2,"3"]}');
-    },
-
-    'encoding a message packet': function () {
-      parser.encodePacket({
-          type: 'message'
-        , endpoint: ''
-        , data: 'woot'
-      }).should().eql('3:::woot');
-    },
-
-    'encoding a message packet with id and endpoint': function () {
-      parser.encodePacket({
-          type: 'message'
-        , id: 5
-        , ack: true
-        , endpoint: '/tobi'
-        , data: ''
-      }).should().eql('3:5:/tobi');
-    },
-
-    'encoding a heartbeat packet': function () {
-      parser.encodePacket({
-          type: 'heartbeat'
-        , endpoint: ''
-      }).should().eql('2::');
-    },
-
-    'encoding a connection packet': function () {
-      parser.encodePacket({
-          type: 'connect'
-        , endpoint: '/tobi'
-        , qs: ''
-      }).should().eql('1::/tobi');
-    },
-
-    'encoding a connection packet with query string': function () {
-      parser.encodePacket({
-          type: 'connect'
-        , endpoint: '/test'
-        , qs: '?test=1'
-      }).should().eql('1::/test:?test=1');
-    },
-
-    'encoding a disconnection packet': function () {
-      parser.encodePacket({
-          type: 'disconnect'
-        , endpoint: '/woot'
-      }).should().eql('0::/woot');
-    },
-
-    'test decoding a payload': function () {
-      parser.decodePayload('\ufffd5\ufffd3:::5\ufffd7\ufffd3:::53d'
-        + '\ufffd3\ufffd0::').should().eql([
-          { type: 'message', data: '5', endpoint: '' }
-        , { type: 'message', data: '53d', endpoint: '' }
-        , { type: 'disconnect', endpoint: '' }
-      ]);
-    },
-
-    'test encoding a payload': function () {
-      parser.encodePayload([
-          parser.encodePacket({ type: 'message', data: '5', endpoint: '' })
-        , parser.encodePacket({ type: 'message', data: '53d', endpoint: '' })
-      ]).should().eql('\ufffd5\ufffd3:::5\ufffd7\ufffd3:::53d')
-    },
-
-    'test decoding newline': function () {
-      parser.decodePacket('3:::\n').should().eql({
-          type: 'message'
-        , endpoint: ''
-        , data: '\n'
-      });
+    } catch (e) {
+      thrown = true;
     }
 
-  };
+    assume(thrown).false();
+  });
 
-})(
-    'undefined' == typeof module ? module = {} : module
-  , 'undefined' == typeof io ? require('socket.io-client') : io
-  , 'undefined' == typeof should ? require('should') : should
-);
+  it('decoding json packet', function () {
+    assume(parser.decodePacket('4:::"2"')).eql({
+        type: 'json'
+      , endpoint: ''
+      , data: '2'
+    });
+  });
+
+  it('decoding json packet with message id and ack data', function () {
+    assume(parser.decodePacket('4:1+::{"a":"b"}')).eql({
+        type: 'json'
+      , id: '1'
+      , ack: 'data'
+      , endpoint: ''
+      , data: { a: 'b' }
+    });
+  });
+
+  it('decoding an event packet', function () {
+    assume(parser.decodePacket('5:::{"name":"woot"}')).eql({
+        type: 'event'
+      , name: 'woot'
+      , endpoint: ''
+      , args: []
+    });
+  });
+
+  it('decoding an event packet with message id and ack', function () {
+    assume(parser.decodePacket('5:1+::{"name":"tobi"}')).eql({
+        type: 'event'
+      , id: '1'
+      , ack: 'data'
+      , endpoint: ''
+      , name: 'tobi'
+      , args: []
+    });
+  });
+
+  it('decoding an event packet with data', function () {
+    assume(parser.decodePacket('5:::{"name":"edwald","args":[{"a": "b"},2,"3"]}'))
+    .eql({
+        type: 'event'
+      , name: 'edwald'
+      , endpoint: ''
+      , args: [{a: 'b'}, 2, '3']
+    });
+  });
+
+  it('decoding a message packet', function () {
+    assume(parser.decodePacket('3:::woot')).eql({
+        type: 'message'
+      , endpoint: ''
+      , data: 'woot'
+    });
+  });
+
+  it('decoding a message packet with id and endpoint', function () {
+    assume(parser.decodePacket('3:5:/tobi')).eql({
+        type: 'message'
+      , id: '5'
+      , ack: true
+      , endpoint: '/tobi'
+      , data: ''
+    });
+  });
+
+  it('decoding a heartbeat packet', function () {
+    assume(parser.decodePacket('2:::')).eql({
+        type: 'heartbeat'
+      , endpoint: ''
+    });
+  });
+
+  it('decoding a connection packet', function () {
+    assume(parser.decodePacket('1::/tobi')).eql({
+        type: 'connect'
+      , endpoint: '/tobi'
+      , qs: ''
+    });
+  });
+
+  it('decoding a connection packet with query string', function () {
+    assume(parser.decodePacket('1::/test:?test=1')).eql({
+        type: 'connect'
+      , endpoint: '/test'
+      , qs: '?test=1'
+    });
+  });
+
+  it('decoding a disconnection packet', function () {
+    assume(parser.decodePacket('0::/woot')).eql({
+        type: 'disconnect'
+      , endpoint: '/woot'
+    });
+  });
+
+  it('encoding error packet', function () {
+    assume(parser.encodePacket({
+        type: 'error'
+      , reason: ''
+      , advice: ''
+      , endpoint: ''
+    })).equal('7::');
+  });
+
+  it('encoding error packet with reason', function () {
+    assume(parser.encodePacket({
+        type: 'error'
+      , reason: 'transport not supported'
+      , advice: ''
+      , endpoint: ''
+    })).equal('7:::0');
+  });
+
+  it('encoding error packet with reason and advice', function () {
+    assume(parser.encodePacket({
+        type: 'error'
+      , reason: 'unauthorized'
+      , advice: 'reconnect'
+      , endpoint: ''
+    })).equal('7:::2+0');
+  });
+
+  it('encoding error packet with endpoint', function () {
+    assume(parser.encodePacket({
+        type: 'error'
+      , reason: ''
+      , advice: ''
+      , endpoint: '/woot'
+    })).equal('7::/woot');
+  });
+
+  it('encoding ack packet', function () {
+    assume(parser.encodePacket({
+        type: 'ack'
+      , ackId: '140'
+      , endpoint: ''
+      , args: []
+    })).equal('6:::140');
+  });
+
+  it('encoding ack packet with args', function () {
+    assume(parser.encodePacket({
+        type: 'ack'
+      , ackId: '12'
+      , endpoint: ''
+      , args: ['woot', 'wa']
+    })).equal('6:::12+["woot","wa"]');
+  });
+
+  it('encoding json packet', function () {
+    assume(parser.encodePacket({
+        type: 'json'
+      , endpoint: ''
+      , data: '2'
+    })).equal('4:::"2"');
+  });
+
+  it('encoding json packet with message id and ack data', function () {
+    assume(parser.encodePacket({
+        type: 'json'
+      , id: 1
+      , ack: 'data'
+      , endpoint: ''
+      , data: { a: 'b' }
+    })).equal('4:1+::{"a":"b"}');
+  });
+
+  it('encoding an event packet', function () {
+    assume(parser.encodePacket({
+        type: 'event'
+      , name: 'woot'
+      , endpoint: ''
+      , args: []
+    })).equal('5:::{"name":"woot"}');
+  });
+
+  it('encoding an event packet with message id and ack', function () {
+    assume(parser.encodePacket({
+        type: 'event'
+      , id: 1
+      , ack: 'data'
+      , endpoint: ''
+      , name: 'tobi'
+      , args: []
+    })).equal('5:1+::{"name":"tobi"}');
+  });
+
+  it('encoding an event packet with data', function () {
+    assume(parser.encodePacket({
+        type: 'event'
+      , name: 'edwald'
+      , endpoint: ''
+      , args: [{a: 'b'}, 2, '3']
+    })).equal('5:::{"name":"edwald","args":[{"a":"b"},2,"3"]}');
+  });
+
+  it('encoding a message packet', function () {
+    assume(parser.encodePacket({
+        type: 'message'
+      , endpoint: ''
+      , data: 'woot'
+    })).equal('3:::woot');
+  });
+
+  it('encoding a message packet with id and endpoint', function () {
+    assume(parser.encodePacket({
+        type: 'message'
+      , id: 5
+      , ack: true
+      , endpoint: '/tobi'
+      , data: ''
+    })).equal('3:5:/tobi');
+  });
+
+  it('encoding a heartbeat packet', function () {
+    assume(parser.encodePacket({
+        type: 'heartbeat'
+      , endpoint: ''
+    })).equal('2::');
+  });
+
+  it('encoding a connection packet', function () {
+    assume(parser.encodePacket({
+        type: 'connect'
+      , endpoint: '/tobi'
+      , qs: ''
+    })).equal('1::/tobi');
+  });
+
+  it('encoding a connection packet with query string', function () {
+    assume(parser.encodePacket({
+        type: 'connect'
+      , endpoint: '/test'
+      , qs: '?test=1'
+    })).equal('1::/test:?test=1');
+  });
+
+  it('encoding a disconnection packet', function () {
+    assume(parser.encodePacket({
+        type: 'disconnect'
+      , endpoint: '/woot'
+    })).equal('0::/woot');
+  });
+
+  it('test decoding a payload', function () {
+    assume(parser.decodePayload('\ufffd5\ufffd3:::5\ufffd7\ufffd3:::53d'
+      + '\ufffd3\ufffd0::')).eql([
+        { type: 'message', data: '5', endpoint: '' }
+      , { type: 'message', data: '53d', endpoint: '' }
+      , { type: 'disconnect', endpoint: '' }
+    ]);
+  });
+
+  it('test encoding a payload', function () {
+    assume(parser.encodePayload([
+        parser.encodePacket({ type: 'message', data: '5', endpoint: '' })
+      , parser.encodePacket({ type: 'message', data: '53d', endpoint: '' })
+    ])).equal('\ufffd5\ufffd3:::5\ufffd7\ufffd3:::53d');
+  });
+
+  it('test decoding newline', function () {
+    assume(parser.decodePacket('3:::\n')).eql({
+        type: 'message'
+      , endpoint: ''
+      , data: '\n'
+    });
+  });
+});

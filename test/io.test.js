@@ -1,31 +1,19 @@
+describe('io', function () {
+  'use strict';
 
-/*!
- * socket.io-node
- * Copyright(c) 2011 LearnBoost <dev@learnboost.com>
- * MIT Licensed
- */
+  var assume = require('assume')
+    , io = require('..');
 
-(function (module, io, should) {
+  it('client version number', function () {
+      assume(io.version).match(/([0-9]+)\.([0-9]+)\.([0-9]+)/);
+  });
 
-  module.exports = {
-    
-    'client version number': function () {
-      io.version.should().match(/([0-9]+)\.([0-9]+)\.([0-9]+)/);
-    },
+  it('socket.io protocol version', function () {
+    assume(io.protocol).is.a('number');
+    assume(io.protocol.toString()).match(/^\d+$/);
+  });
 
-    'socket.io protocol version': function () {
-      io.protocol.should().be.a('number');
-      io.protocol.toString().should().match(/^\d+$/);
-    },
-
-    'socket.io available transports': function () {
-      (io.transports.length > 0).should().be_true;
-    }
-
-  };
-
-})(
-    'undefined' == typeof module ? module = {} : module
-  , 'undefined' == typeof io ? require('socket.io-client') : io
-  , 'undefined' == typeof should ? require('should') : should
-);
+  it('socket.io available transports', function () {
+    assume(io.transports.length > 0).true();
+  });
+});

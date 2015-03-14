@@ -1,120 +1,108 @@
+describe('events', function () {
+  'use strict';
 
-/*!
- * socket.io-node
- * Copyright(c) 2011 LearnBoost <dev@learnboost.com>
- * MIT Licensed
- */
+  var assume = require('assume')
+    , io = require('..');
 
-(function (module, io, should) {
+  it('add listeners', function () {
+    var event = new io.EventEmitter()
+      , calls = 0;
 
-  module.exports = {
+    event.on('test', function (a, b) {
+      ++calls;
+      assume(a).equal('a');
+      assume(b).equal('b');
+    });
 
-    'add listeners': function () {
-      var event = new io.EventEmitter
-        , calls = 0;
+    event.emit('test', 'a', 'b');
+    assume(calls).equal(1);
+    assume(event.on).equal(event.addListener);
+  });
 
-      event.on('test', function (a, b) {
-        ++calls;
-        a.should().eql('a');
-        b.should().eql('b');
-      });
+  it('remove listener', function () {
+    var event = new io.EventEmitter();
+    function empty () { }
 
-      event.emit('test', 'a', 'b');
-      calls.should().eql(1);
-      event.on.should().eql(event.addListener);
-    },
+    event.on('test', empty);
+    event.on('test:more', empty);
+    event.removeAllListeners('test');
 
-    'remove listener': function () {
-      var event = new io.EventEmitter;
-      function empty () { }
+    assume(event.listeners('test')).eql([]);
+    assume(event.listeners('test:more')).eql([empty]);
+  });
 
-      event.on('test', empty);
-      event.on('test:more', empty);
-      event.removeAllListeners('test');
+  it('remove all listeners with no arguments', function () {
+    var event = new io.EventEmitter();
+    function empty () { }
 
-      event.listeners('test').should().eql([]);
-      event.listeners('test:more').should().eql([empty]);
-    },
+    event.on('test', empty);
+    event.on('test:more', empty);
+    event.removeAllListeners();
 
-    'remove all listeners with no arguments': function () {
-      var event = new io.EventEmitter;
-      function empty () { }
+    assume(event.listeners('test')).eql([]);
+    assume(event.listeners('test:more')).eql([]);
+  });
 
-      event.on('test', empty);
-      event.on('test:more', empty);
-      event.removeAllListeners();
+  it('remove listeners functions', function () {
+    var event = new io.EventEmitter()
+      , calls = 0;
 
-      event.listeners('test').should().eql([]);
-      event.listeners('test:more').should().eql([]);
-    },
+    function one () { ++calls; }
+    function two () { ++calls; }
+    function three () { ++calls; }
 
-    'remove listeners functions': function () {
-      var event = new io.EventEmitter
-        , calls = 0;
+    event.on('one', one);
+    event.removeListener('one', one);
+    assume(event.listeners('one')).eql([]);
 
-      function one () { ++calls }
-      function two () { ++calls }
-      function three () { ++calls }
+    event.on('two', two);
+    event.removeListener('two', one);
+    assume(event.listeners('two')).eql([two]);
 
-      event.on('one', one);
-      event.removeListener('one', one);
-      event.listeners('one').should().eql([]);
+    event.on('three', three);
+    event.on('three', two);
+    event.removeListener('three', three);
+    assume(event.listeners('three')).eql([two]);
+  });
 
-      event.on('two', two);
-      event.removeListener('two', one);
-      event.listeners('two').should().eql([two]);
+  it('number of arguments', function () {
+    var event = new io.EventEmitter()
+      , number = [];
 
-      event.on('three', three);
-      event.on('three', two);
-      event.removeListener('three', three);
-      event.listeners('three').should().eql([two]);
-    },
+    event.on('test', function () {
+      number.push(arguments.length);
+    });
 
-    'number of arguments': function () {
-      var event = new io.EventEmitter
-        , number = [];
+    event.emit('test');
+    event.emit('test', null);
+    event.emit('test', null, null);
+    event.emit('test', null, null, null);
+    event.emit('test', null, null, null, null);
+    event.emit('test', null, null, null, null, null);
 
-      event.on('test', function () {
-        number.push(arguments.length);
-      });
+    assume([0, 1, 2, 3, 4, 5]).eql(number);
+  });
 
-      event.emit('test');
-      event.emit('test', null);
-      event.emit('test', null, null);
-      event.emit('test', null, null, null);
-      event.emit('test', null, null, null, null);
-      event.emit('test', null, null, null, null, null);
+  it('once', function () {
+    var event = new io.EventEmitter()
+      , calls = 0;
 
-      [0, 1, 2, 3, 4, 5].should().eql(number);
-    },
+    event.once('test', function () {
+      ++calls;
+    });
 
-    'once': function () {
-      var event = new io.EventEmitter
-        , calls = 0;
+    event.emit('test', 'a', 'b');
+    event.emit('test', 'a', 'b');
+    event.emit('test', 'a', 'b');
 
-      event.once('test', function (a, b) {
-        ++calls;
-      });
-
-      event.emit('test', 'a', 'b');
-      event.emit('test', 'a', 'b');
-      event.emit('test', 'a', 'b');
-
-      function removed () {
-        should().fail('not removed');
-      };
-
-      event.once('test:removed', removed);
-      event.removeListener('test:removed', removed);
-      event.emit('test:removed');
-
-      calls.should().eql(1);
+    function removed () {
+      throw new Error('not removed');
     }
 
-  };
+    event.once('test:removed', removed);
+    event.removeListener('test:removed', removed);
+    event.emit('test:removed');
 
-})(
-    'undefined' == typeof module ? module = {} : module
-  , 'undefined' == typeof io ? require('socket.io-client') : io
-  , 'undefined' == typeof should || !should.fail ? require('should') : should
-);
+    assume(calls).equal(1);
+  });
+});
