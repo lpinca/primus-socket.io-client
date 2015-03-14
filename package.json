@@ -11,7 +11,7 @@
     "ajax"
   ],
   "homepage": "https://github.com/lpinca/primus-socket.io-client",
-  "bugs": "https://github.com//primus-socket.io-client/issues",
+  "bugs": "https://github.com/lpinca/primus-socket.io-client/issues",
   "license": "MIT",
   "author": "Luigi Pinca",
   "main": "lib/io.js",
