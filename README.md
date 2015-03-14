@@ -60,7 +60,7 @@ socket.on('connect', function () {
 });
 ```
 
-### Documentation 
+### Documentation
 
 #### io#connect
 
@@ -91,7 +91,7 @@ io.connect(uri, [options]);
 ```
 
   The amount of milliseconds a transport has to create a connection before we consider it timed out.
-  
+
 - *'try multiple transports'*
 
 ```js
@@ -99,15 +99,15 @@ true
 ```
 
   A boolean indicating if we should try other transports when the  connectTimeout occurs.
-  
+
 - *reconnect*
 
 ```js
 true
 ```
 
-  A boolean indicating if we should automatically reconnect if a connection is disconnected. 
-  
+  A boolean indicating if we should automatically reconnect if a connection is disconnected.
+
 - *'reconnection delay'*
 
 ```js
@@ -115,7 +115,7 @@ true
 ```
 
   The amount of milliseconds before we try to connect to the server again. We are using a exponential back off algorithm for the following reconnections, on each reconnect attempt this value will get multiplied (500 > 1000 > 2000 > 4000 > 8000).
-  
+
 
 - *'max reconnection attempts'*
 
@@ -134,7 +134,7 @@ true
 - *connected*
 
   Whether the socket is connected or not.
-  
+
 - *connecting*
 
   Whether the socket is connecting or not.
@@ -142,25 +142,25 @@ true
 - *reconnecting*
 
   Whether we are reconnecting or not.
-  
-- *transport*  
+
+- *transport*
 
   The transport instance.
 
 ##### Methods:
-  
+
 - *connect(λ)*
 
   Establishes a connection. If λ is supplied as argument, it will be called once the connection is established.
-  
+
 - *send(message)*
-  
+
   A string of data to send.
-  
+
 - *disconnect*
 
   Closes the connection.
-  
+
 - *on(event, λ)*
 
   Adds a listener for the event *event*.
@@ -168,40 +168,40 @@ true
 - *once(event, λ)*
 
   Adds a one time listener for the event *event*. The listener is removed after the first time the event is fired.
-  
+
 - *removeListener(event, λ)*
 
   Removes the listener λ for the event *event*.
-  
+
 ##### Events:
 
 - *connect*
 
   Fired when the connection is established and the handshake successful.
-  
+
 - *connecting(transport_type)*
 
     Fired when a connection is attempted, passing the transport name.
-  
+
 - *connect_failed*
 
     Fired when the connection timeout occurs after the last connection attempt.
   This only fires if the `connectTimeout` option is set.
   If the `tryTransportsOnConnectTimeout` option is set, this only fires once all
   possible transports have been tried.
-  
+
 - *message(message)*
-  
+
   Fired when a message arrives from the server
 
 - *close*
 
   Fired when the connection is closed. Be careful with using this event, as some transports will fire it even under temporary, expected disconnections (such as XHR-Polling).
-  
+
 - *disconnect*
 
   Fired when the connection is considered disconnected.
-  
+
 - *reconnect(transport_type,reconnectionAttempts)*
 
   Fired when the connection has been re-established. This only fires if the `reconnect` option is set.
@@ -212,7 +212,7 @@ true
 
 - *reconnect_failed*
 
-  Fired when all reconnection attempts have failed and we where unsuccessful in reconnecting to the server.  
+  Fired when all reconnection attempts have failed and we where unsuccessful in reconnecting to the server.
 
 ### Contributors
 
@@ -220,27 +220,6 @@ Guillermo Rauch &lt;guillermo@learnboost.com&gt;
 
 Arnout Kazemier &lt;info@3rd-eden.com&gt;
 
-### License 
+### License
 
-(The MIT License)
-
-Copyright (c) 2010 LearnBoost &lt;dev@learnboost.com&gt;
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+[MIT](LICENSE)
