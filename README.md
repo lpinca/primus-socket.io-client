@@ -1,6 +1,6 @@
 # primus-socket.io-client
 
-[![Version npm][npm-binary-pack-badge]][npm-binary-pack][![Build Status][travis-binary-pack-badge]][travis-binary-pack][![Dependencies][david-binary-pack-badge]][david-binary-pack][![Coverage Status][coverage-binary-pack-badge]][coverage-binary-pack][![IRC channel][irc-badge]][irc]
+[![Version npm][npm-primus-socket.io-client-badge]][npm-primus-socket.io-client][![Build Status][travis-primus-socket.io-client-badge]][travis-primus-socket.io-client][![Dependencies][david-primus-socket.io-client-badge]][david-primus-socket.io-client][![Coverage Status][coverage-primus-socket.io-client-badge]][coverage-primus-socket.io-client][![IRC channel][irc-badge]][irc]
 
 [npm-primus-socket.io-client-badge]: https://img.shields.io/npm/v/primus-socket.io-client.svg?style=flat-square
 [npm-primus-socket.io-client]: http://browsenpm.org/package/primus-socket.io-client
