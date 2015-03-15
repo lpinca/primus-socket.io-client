@@ -10,14 +10,14 @@
     "comet",
     "ajax"
   ],
-  "homepage": "https://github.com/lpinca/primus-socket.io-client",
-  "bugs": "https://github.com/lpinca/primus-socket.io-client/issues",
+  "homepage": "https://github.com/primus/primus-socket.io-client",
+  "bugs": "https://github.com/primus/primus-socket.io-client/issues",
   "license": "MIT",
   "author": "Luigi Pinca",
   "main": "lib/io.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lpinca/primus-socket.io-client.git"
+    "url": "https://github.com/primus/primus-socket.io-client.git"
   },
   "scripts": {
     "test": "mocha $(find test -name '*.test.js')",
