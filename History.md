@@ -1,3 +1,8 @@
+1.0.0 / 2015-03-15
+==================
+
+ * Fix a bug in the namespacing used for browser builds
+ * Abort the connection if the socket gets closed during the handshake
 
 0.9.17 / 2014-05-22
 ===================
@@ -116,7 +121,7 @@
 
   * Bumped client
 
-0.8.6 / 2011-10-27 
+0.8.6 / 2011-10-27
 ==================
 
   * Added WebWorker support.
@@ -215,7 +220,7 @@
   * Honor document protocol, unless overriden. [dvv]
   * Fixed new builder dependencies. [3rd-Eden]
 
-0.7.3 / 2011-06-30 
+0.7.3 / 2011-06-30
 ==================
 
   * Fixed; acks don't depend on arity. They're automatic for `.send` and
