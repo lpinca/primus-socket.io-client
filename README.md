@@ -1,5 +1,17 @@
-socket.io
-=========
+# primus-socket.io-client
+
+[![Version npm][npm-binary-pack-badge]][npm-binary-pack][![Build Status][travis-binary-pack-badge]][travis-binary-pack][![Dependencies][david-binary-pack-badge]][david-binary-pack][![Coverage Status][coverage-binary-pack-badge]][coverage-binary-pack][![IRC channel][irc-badge]][irc]
+
+[npm-primus-socket.io-client-badge]: https://img.shields.io/npm/v/primus-socket.io-client.svg?style=flat-square
+[npm-primus-socket.io-client]: http://browsenpm.org/package/primus-socket.io-client
+[travis-primus-socket.io-client-badge]: https://img.shields.io/travis/primus/primus-socket.io-client/master.svg?style=flat-square
+[travis-primus-socket.io-client]: https://travis-ci.org/primus/primus-socket.io-client
+[david-primus-socket.io-client-badge]: https://img.shields.io/david/primus/primus-socket.io-client.svg?style=flat-square
+[david-primus-socket.io-client]: https://david-dm.org/primus/primus-socket.io-client
+[coverage-primus-socket.io-client-badge]: https://img.shields.io/coveralls/primus/primus-socket.io-client/master.svg?style=flat-square
+[coverage-primus-socket.io-client]: https://coveralls.io/r/primus/primus-socket.io-client?branch=master
+[irc-badge]: https://img.shields.io/badge/IRC-irc.freenode.net%23primus-00a8ff.svg?style=flat-square
+[irc]: https://webchat.freenode.net/?channels=primus
 
 #### Sockets for the rest of us
 
