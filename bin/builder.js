@@ -2,10 +2,10 @@
  * Module dependencies.
  */
 
-var fs = require('fs')
+var activeXObfuscator = require('active-x-obfuscator')
+  , minify = require('uglify-js').minify
   , socket = require('../lib/io')
-  , uglify = require('uglify-js')
-  , activeXObfuscator = require('active-x-obfuscator');
+  , fs = require('fs');
 
 /**
  * License headers.
@@ -236,11 +236,8 @@ var builder = module.exports = function () {
 
       // check if we need to process it any further
       if (settings.minify) {
-        var ast = uglify.parser.parse(code);
-        ast = uglify.uglify.ast_mangle(ast);
-        ast = uglify.uglify.ast_squeeze(ast);
-
-        code = production + uglify.uglify.gen_code(ast, { ascii_only: true });
+        var result = minify(code, { fromString: true });
+        code = production + result.code;
       }
 
       callback(error, code);
@@ -281,12 +278,7 @@ if (!module.parent){
   builder(args.length ? args : false, { minify: false }, function (err, content) {
     if (err) return console.error(err);
 
-    fs.write(
-        fs.openSync(__dirname + '/../dist/primus-socket.io.js', 'w')
-      , content
-      , 0
-      , 'utf8'
-    );
+    fs.writeFileSync(__dirname + '/../dist/primus-socket.io.js', content);
     console.log('Successfully generated the development build: primus-socket.io.js');
   });
 
@@ -294,12 +286,7 @@ if (!module.parent){
   builder(args.length ? args : false, function (err, content) {
     if (err) return console.error(err);
 
-    fs.write(
-        fs.openSync(__dirname + '/../dist/primus-socket.io.min.js', 'w')
-      , content
-      , 0
-      , 'utf8'
-    );
+    fs.writeFileSync(__dirname + '/../dist/primus-socket.io.min.js', content);
     console.log('Successfully generated the production build: primus-socket.io.min.js');
   });
 }
