@@ -19,8 +19,18 @@ var fs = require('fs')
  * @api private
  */
 
-var template = '/*! Socket.IO.%ext% build:' + socket.version + ', %type%. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */\n'
-  , development = template.replace('%type%', 'development').replace('%ext%', 'js')
+var template = [
+  '/*!',
+  ' * primus-socket.io.%ext% build: ' + socket.version + ', %type%.',
+  ' * Copyright(c) 2011 LearnBoost <dev@learnboost.com>',
+  ' * Copyright (c) 2013 Automattic <dev@cloudup.com>',
+  ' * Copyright (c) 2015 Luigi Pinca',
+  ' * MIT Licensed',
+  ' */',
+  ''
+].join('\n');
+
+var development = template.replace('%type%', 'development').replace('%ext%', 'js')
   , production = template.replace('%type%', 'production').replace('%ext%', 'min.js');
 
 /**
@@ -278,12 +288,12 @@ if (!module.parent){
     if (err) return console.error(err);
 
     fs.write(
-        fs.openSync(__dirname + '/../dist/socket.io.js', 'w')
+        fs.openSync(__dirname + '/../dist/primus-socket.io.js', 'w')
       , content
       , 0
       , 'utf8'
     );
-    console.log('Successfully generated the development build: socket.io.js');
+    console.log('Successfully generated the development build: primus-socket.io.js');
   });
 
   // and build a production build
@@ -291,11 +301,11 @@ if (!module.parent){
     if (err) return console.error(err);
 
     fs.write(
-        fs.openSync(__dirname + '/../dist/socket.io.min.js', 'w')
+        fs.openSync(__dirname + '/../dist/primus-socket.io.min.js', 'w')
       , content
       , 0
       , 'utf8'
     );
-    console.log('Successfully generated the production build: socket.io.min.js');
+    console.log('Successfully generated the production build: primus-socket.io.min.js');
   });
 }
