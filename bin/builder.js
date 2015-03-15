@@ -55,7 +55,7 @@ var base = [
 
 /**
  * The available transports for Socket.IO. These are mapped as:
- * 
+ *
  *   - `key` the name of the transport
  *   - `value` the dependencies for the transport
  *
@@ -71,7 +71,7 @@ var baseTransports = {
       , 'transports/flashsocket.js'
       , 'vendor/web-socket-js/swfobject.js'
       , 'vendor/web-socket-js/web_socket.js'
-    ] 
+    ]
   , 'htmlfile': ['transports/xhr.js', 'transports/htmlfile.js']
   /* FIXME: re-enable me once we have multi-part support
   , 'xhr-multipart': ['transports/xhr.js', 'transports/xhr-multipart.js'] */
@@ -84,15 +84,20 @@ var baseTransports = {
 };
 
 /**
- * Wrappers for client-side usage.
- * This enables usage in top-level browser window and client-side CommonJS systems.
+ * Wrapper for client-side usage.
  * If doing a node build for server-side client, this wrapper is NOT included.
  * @api private
  */
-var wrapperPre = "\nvar io = ('undefined' === typeof module ? {} : module.exports);\n(function() {\n";
+var wrapperPre = [
+  '',
+  '(function (f) {',
+  '  var g = \'undefined\' !== typeof window ? window : self;',
+  '  g.io = {};',
+  '  f.call(g, g.io);',
+  '})(function (io) {',
+].join('\n');
 
-var wrapperPost = "\n})();";
-
+var wrapperPost = '});\n';
 
 /**
  * Builds a custom Socket.IO distribution based on the transports that you
@@ -123,14 +128,9 @@ var builder = module.exports = function () {
     var type = Object.prototype.toString.call(arg)
         .replace(/\[object\s(\w+)\]/gi , '$1' ).toLowerCase();
 
-    switch (type) {
-      case 'array':
-        return transports = arg;
-      case 'object':
-        return options = arg;
-      case 'function':
-        return callback = arg;
-    }
+    if ('array' === type) transports = arg;
+    else if ('object' === type) options = arg;
+    else if ('function' === type) callback = arg;
   });
 
   // Add defaults
@@ -160,7 +160,7 @@ var builder = module.exports = function () {
     dependencies.forEach(function (file) {
       var path = __dirname + '/../lib/' + file;
       if (!~files.indexOf(path)) files.push(path);
-    })
+    });
   });
 
   // check to see if the files tree compilation generated any errors.
@@ -226,7 +226,7 @@ var builder = module.exports = function () {
             ignore--;
           }
 
-          return ret == 0;
+          return ret === 0;
         }).join('\n');
       }
 
@@ -240,8 +240,8 @@ var builder = module.exports = function () {
       }
 
       callback(error, code);
-    })
-  })
+    });
+  });
 };
 
 /**
@@ -252,7 +252,7 @@ var builder = module.exports = function () {
  * @type {String}
  * @api public
  */
- 
+
 builder.version = socket.version;
 
 /**
@@ -261,20 +261,20 @@ builder.version = socket.version;
  * @type {Object}
  * @api public
  */
- 
+
 builder.transports = baseTransports;
 
 /**
  * Command line support, this allows us to generate builds without having
  * to load it as module.
  */
- 
+
 if (!module.parent){
   // the first 2 are `node` and the path to this file, we don't need them
   var args = process.argv.slice(2);
 
   // build a development build
-  builder(args.length ? args : false, { minify:false }, function (err, content) {
+  builder(args.length ? args : false, { minify: false }, function (err, content) {
     if (err) return console.error(err);
 
     fs.write(
@@ -289,7 +289,7 @@ if (!module.parent){
   // and build a production build
   builder(args.length ? args : false, function (err, content) {
     if (err) return console.error(err);
- 
+
     fs.write(
         fs.openSync(__dirname + '/../dist/socket.io.min.js', 'w')
       , content
