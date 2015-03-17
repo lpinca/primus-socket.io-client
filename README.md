@@ -13,6 +13,12 @@
 [irc-badge]: https://img.shields.io/badge/IRC-irc.freenode.net%23primus-00a8ff.svg?style=flat-square
 [irc]: https://webchat.freenode.net/?channels=primus
 
+This is a fork of Socket.IO's original Socket.IO 0.9 client code base. We've forked
+it to provide additional stability fixes. One of the main reasons we still maintain
+this fork is that using Socket.IO 1.0 inside of Primus doesn't make sense as 
+Socket.IO 1.0 is just a wrapper around Engine.IO so it makes more sense for our
+users to use our `engine.io` transformer instead of supporting Socket.IO 1.0.
+
 #### Sockets for the rest of us
 
 The `socket.io` client is basically a simple HTTP Socket interface implementation.
