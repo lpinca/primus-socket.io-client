@@ -18,7 +18,7 @@ var template = [
   ' * primus-socket.io.%ext% build: ' + socket.version + ', %type%.',
   ' * Copyright(c) 2011 LearnBoost <dev@learnboost.com>',
   ' * Copyright (c) 2013 Automattic <dev@cloudup.com>',
-  ' * Copyright (c) 2015 Luigi Pinca',
+  ' * Copyright (c) 2015 contributors of the Primus project, http://primus.io',
   ' * MIT Licensed',
   ' */',
   ''
@@ -174,7 +174,7 @@ var builder = module.exports = function () {
   files.forEach(function (file) {
     fs.readFile(file, function (err, content) {
       if (err) error = err;
-      results[file] = content;
+      results[file] = '\n'+ content;
 
       // check if we are done yet, or not.. Just by checking the size of the result
       // object.
