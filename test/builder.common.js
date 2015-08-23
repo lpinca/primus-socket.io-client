@@ -9,49 +9,49 @@ var vm = require('vm');
 
 exports.env = function env () {
   var details = {
-      location: {
-          port: 8080
-        , host: 'www.example.org'
-        , hostname: 'www.example.org'
-        , href: 'http://www.example.org/example/'
-        , pathname: '/example/'
-        , protocol: 'http:'
-        , search: ''
-        , hash: ''
-      }
-    , console: {
-        log:   function(){},
-        info:  function(){},
-        warn:  function(){},
-        error: function(){}
-      }
-    , navigator: {
-          userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_7) AppleWebKit'
-           + '/534.27 (KHTML, like Gecko) Chrome/12.0.716.0 Safari/534.27'
-        , appName: 'socket.io'
-        , platform: process.platform
-        , appVersion: process.version
-    , }
-    , name: 'socket.io'
-    , innerWidth: 1024
-    , innerHeight: 768
-    , length: 1
-    , outerWidth: 1024
-    , outerHeight: 768
-    , pageXOffset: 0
-    , pageYOffset: 0
-    , screenX: 0
-    , screenY: 0
-    , screenLeft: 0
-    , screenTop: 0
-    , scrollX: 0
-    , scrollY: 0
-    , scrollTop: 0
-    , scrollLeft: 0
-    , screen: {
-          width: 0
-        , height: 0
-      }
+    location: {
+      port: 8080,
+      host: 'www.example.org',
+      hostname: 'www.example.org',
+      href: 'http://www.example.org/example/',
+      pathname: '/example/',
+      protocol: 'http:',
+      search: '',
+      hash: ''
+    },
+    console: {
+      log:   function(){},
+      info:  function(){},
+      warn:  function(){},
+      error: function(){}
+    },
+    navigator: {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_7) AppleWebKit'
+        + '/534.27 (KHTML, like Gecko) Chrome/12.0.716.0 Safari/534.27',
+      appName: 'socket.io',
+      platform: process.platform,
+      appVersion: process.version
+    },
+    screen: {
+      width: 0,
+      height: 0
+    },
+    name: 'socket.io',
+    innerWidth: 1024,
+    innerHeight: 768,
+    length: 1,
+    outerWidth: 1024,
+    outerHeight: 768,
+    pageXOffset: 0,
+    pageYOffset: 0,
+    screenX: 0,
+    screenY: 0,
+    screenLeft: 0,
+    screenTop: 0,
+    scrollX: 0,
+    scrollY: 0,
+    scrollTop: 0,
+    scrollLeft: 0
   };
 
   // circular references
@@ -71,8 +71,13 @@ exports.env = function env () {
   details.frames = [details];
 
   // document
-  details.document = details;
-  details.document.domain = details.location.href;
+  details.document = {
+    domain: details.location.host,
+    location: details.location,
+    documentElement: {
+      style: {}
+    }
+  };
 
   return details;
 };
@@ -86,11 +91,10 @@ exports.env = function env () {
  */
 
 exports.execute = function execute (contents) {
-  var env = exports.env()
-    , script = vm.createScript(contents);
+  var sandbox = exports.env();
 
   // run the script with `browser like` globals
-  script.runInNewContext(env);
+  vm.runInNewContext(contents, sandbox);
 
-  return env;
+  return sandbox;
 };
