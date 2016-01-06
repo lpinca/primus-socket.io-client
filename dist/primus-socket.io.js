@@ -1,5 +1,5 @@
 /*!
- * primus-socket.io.js build: 1.0.1, development.
+ * primus-socket.io.js build: 1.0.3, development.
  * Copyright(c) 2011 LearnBoost <dev@learnboost.com>
  * Copyright (c) 2013 Automattic <dev@cloudup.com>
  * Copyright (c) 2015 contributors of the Primus project, http://primus.io
@@ -27,7 +27,7 @@
    * @api public
    */
 
-  io.version = '1.0.1';
+  io.version = '1.0.3';
 
   /**
    * Protocol implemented.
