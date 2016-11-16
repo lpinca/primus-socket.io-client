@@ -25,14 +25,14 @@
   },
   "dependencies": {
     "active-x-obfuscator": "0.0.2",
-    "uglify-js": "2.6.x",
-    "ws": "1.0.x",
+    "uglify-js": "~2.7.4",
+    "ws": "~1.1.1",
     "xmlhttprequest": "1.8.0"
   },
   "devDependencies": {
     "assume": "1.4.x",
-    "mocha": "2.4.x",
+    "mocha": "~3.1.2",
     "pre-commit": "1.1.x",
-    "socket.io": "0.9.x"
+    "socket.io": "~1.5.1"
   }
 }
